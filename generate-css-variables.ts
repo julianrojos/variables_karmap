@@ -93,18 +93,20 @@ function generateCssVars(
 }
 
 /**
- * Extrae los nombres de las variables CSS de un archivo CSS
+ * Extrae los nombres y valores de las variables CSS de un archivo CSS
  */
-function extractCssVariableNames(cssContent: string): Set<string> {
-  const variableNames = new Set<string>();
-  const regex = /--([a-z0-9-]+):/g;
+function extractCssVariables(cssContent: string): Map<string, string> {
+  const variables = new Map<string, string>();
+  const regex = /--([a-z0-9-]+):\s*([^;]+);/g;
   let match;
   
   while ((match = regex.exec(cssContent)) !== null) {
-    variableNames.add(match[1]);
+    const name = match[1];
+    const value = match[2].trim();
+    variables.set(name, value);
   }
   
-  return variableNames;
+  return variables;
 }
 
 /**
@@ -119,11 +121,11 @@ function main(): void {
     const fileContent = readFileSync(jsonPath, 'utf-8');
 
     // Leer el archivo CSS anterior si existe para comparar
-    let previousVariables: Set<string> = new Set();
+    let previousVariables: Map<string, string> = new Map();
     if (existsSync(cssPath)) {
       try {
         const previousCss = readFileSync(cssPath, 'utf-8');
-        previousVariables = extractCssVariableNames(previousCss);
+        previousVariables = extractCssVariables(previousCss);
         console.log(`📄 Archivo CSS anterior encontrado con ${previousVariables.size} variables`);
       } catch (error) {
         console.log('⚠️  No se pudo leer el archivo CSS anterior (se creará uno nuevo)');
@@ -186,12 +188,14 @@ function main(): void {
     console.log('🔄 Generando variables CSS desde variables.json...');
     const cssVars = generateCssVars(tokensData);
 
-    // Extraer nombres de variables nuevas
-    const newVariableNames = new Set<string>();
+    // Extraer nombres y valores de variables nuevas
+    const newVariables = new Map<string, string>();
     cssVars.forEach(line => {
-      const match = line.match(/--([a-z0-9-]+):/);
+      const match = line.match(/--([a-z0-9-]+):\s*([^;]+);/);
       if (match) {
-        newVariableNames.add(match[1]);
+        const name = match[1];
+        const value = match[2].trim();
+        newVariables.set(name, value);
       }
     });
 
@@ -207,14 +211,31 @@ function main(): void {
     
     if (previousVariables.size > 0) {
       // Encontrar variables eliminadas
-      const removedVariables = Array.from(previousVariables).filter(
-        name => !newVariableNames.has(name)
-      );
+      const removedVariables: string[] = [];
+      previousVariables.forEach((value, name) => {
+        if (!newVariables.has(name)) {
+          removedVariables.push(name);
+        }
+      });
       
       // Encontrar variables nuevas
-      const addedVariables = Array.from(newVariableNames).filter(
-        name => !previousVariables.has(name)
-      );
+      const addedVariables: string[] = [];
+      newVariables.forEach((value, name) => {
+        if (!previousVariables.has(name)) {
+          addedVariables.push(name);
+        }
+      });
+      
+      // Encontrar variables modificadas (mismo nombre, diferente valor)
+      const modifiedVariables: Array<{ name: string; oldValue: string; newValue: string }> = [];
+      newVariables.forEach((newValue, name) => {
+        if (previousVariables.has(name)) {
+          const oldValue = previousVariables.get(name)!;
+          if (oldValue !== newValue) {
+            modifiedVariables.push({ name, oldValue, newValue });
+          }
+        }
+      });
       
       if (removedVariables.length > 0) {
         console.log(`   🗑️  Variables eliminadas: ${removedVariables.length}`);
@@ -244,7 +265,25 @@ function main(): void {
         }
       }
       
-      if (removedVariables.length === 0 && addedVariables.length === 0) {
+      if (modifiedVariables.length > 0) {
+        console.log(`   🔄 Variables modificadas: ${modifiedVariables.length}`);
+        if (modifiedVariables.length <= 10) {
+          modifiedVariables.forEach(({ name, oldValue, newValue }) => {
+            console.log(`      ~ --${name}`);
+            console.log(`        Antes: ${oldValue}`);
+            console.log(`        Ahora: ${newValue}`);
+          });
+        } else {
+          modifiedVariables.slice(0, 10).forEach(({ name, oldValue, newValue }) => {
+            console.log(`      ~ --${name}`);
+            console.log(`        Antes: ${oldValue}`);
+            console.log(`        Ahora: ${newValue}`);
+          });
+          console.log(`      ... y ${modifiedVariables.length - 10} más`);
+        }
+      }
+      
+      if (removedVariables.length === 0 && addedVariables.length === 0 && modifiedVariables.length === 0) {
         console.log(`   ✓ Sin cambios (todas las variables se mantienen igual)`);
       }
     }
