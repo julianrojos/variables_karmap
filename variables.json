@@ -1,0 +1,544 @@
+{
+      "Font": {
+        "Size": {
+          "Size-32": {
+            "$value": "{Font.Size.Size_32}",
+            "$type": "number"
+          },
+          "Size-20": {
+            "$value": "{Font.Size.Size_20}",
+            "$type": "number"
+          },
+          "Size-40": {
+            "$value": "{Font.Size.Size_32}",
+            "$type": "number"
+          },
+          "Size-16": {
+            "$value": "{Font.Size.Size_16}",
+            "$type": "number"
+          },
+          "Size-18": {
+            "$value": "{Font.Size.Size_18}",
+            "$type": "number"
+          },
+          "Size-14": {
+            "$value": "{Font.Size.Size_14}",
+            "$type": "number"
+          },
+          "Size-28": {
+            "$value": "{Font.Size.Size_28}",
+            "$type": "number"
+          },
+          "Size-24": {
+            "$value": "{Font.Size.Size_24}",
+            "$type": "number"
+          },
+          "Size-12": {
+            "$value": "{Font.Size.Size_12}",
+            "$type": "number"
+          },
+          "Size-10": {
+            "$value": "{Font.Size.Size_10}",
+            "$type": "number"
+          }
+        },
+        "Family": {
+          "Lora": {
+            "$value": "{Font.Family.Lora}",
+            "$type": "string"
+          },
+          "NunitoSans": {
+            "$value": "{Font.Family.NunitoSans}",
+            "$type": "string"
+          }
+        },
+        "Weight": {
+          "Bold": {
+            "$value": "{Font.Weight.Bold}",
+            "$type": "string"
+          },
+          "Regular": {
+            "$value": "{Font.Weight.Regular}",
+            "$type": "string"
+          },
+          "Semibold": {
+            "$value": "{Font.Weight.Semibold}",
+            "$type": "string"
+          }
+        },
+        "Line-Height": {
+          "Line-Height-44": {
+            "$value": "{Font.Line_Height.Line_Height_44}",
+            "$type": "number"
+          },
+          "Line-Height-36": {
+            "$value": "{Font.Line_Height.Line_Height_36}",
+            "$type": "number"
+          },
+          "Line-Height-76": {
+            "$value": "{Font.Line_Height.Line_Height_76}",
+            "$type": "number"
+          }
+        }
+      },
+      "Button": {
+        "Primary": {
+          "Default": {
+            "Bg-Default": {
+              "$value": "{Colors.Primary.300_P}",
+              "$type": "color"
+            },
+            "Foreground-Default": {
+              "$value": "{Common.Colors.Text_Default_Color}",
+              "$type": "color"
+            }
+          },
+          "Hover": {
+            "Bg-Hover": {
+              "$value": "{Colors.Primary.200}",
+              "$type": "color"
+            },
+            "Foreground-Hover": {
+              "$value": "{Colors.Grey.700}",
+              "$type": "color"
+            }
+          },
+          "Active": {
+            "Bg-Active": {
+              "$value": "{Colors.Primary.100}",
+              "$type": "color"
+            },
+            "Foreground-Active": {
+              "$value": "{Colors.Grey.700}",
+              "$type": "color"
+            }
+          },
+          "Disabled": {
+            "Bg-Disabled": {
+              "$value": "{Colors.Grey.100}",
+              "$type": "color"
+            },
+            "Foreground-Disabled": {
+              "$value": "{Colors.Grey.900}",
+              "$type": "color"
+            }
+          }
+        },
+        "Secondary": {
+          "Default": {
+            "Bg-Default": {
+              "$value": "{Colors.Secondary.200_P}",
+              "$type": "color"
+            },
+            "Foreground-Default": {
+              "$value": "{Common.Colors.Text_Default_Color}",
+              "$type": "color"
+            }
+          },
+          "Hover": {
+            "Bg-Hover": {
+              "$value": "{Colors.Secondary.100}",
+              "$type": "color"
+            },
+            "Foreground-Hover": {
+              "$value": "{Colors.Grey.700}",
+              "$type": "color"
+            }
+          },
+          "Active": {
+            "Foreground-Active": {
+              "$value": "{Colors.Grey.700}",
+              "$type": "color"
+            },
+            "Bg-Active": {
+              "$value": "{Colors.Secondary.100}",
+              "$type": "color"
+            }
+          },
+          "Disabled": {
+            "Bg-Disabled": {
+              "$value": "{Colors.Grey.100}",
+              "$type": "color"
+            },
+            "Foreground-Disabled": {
+              "$value": "{Colors.Grey.900}",
+              "$type": "color"
+            }
+          },
+          "View-Secondary": {
+            "$value": "{Booleans.Yes}",
+            "$type": "boolean"
+          }
+        },
+        "Cancel": {
+          "Default": {
+            "Foreground-Default": {
+              "$value": "{Colors.B&W.White}",
+              "$type": "color"
+            },
+            "Bg-Default": {
+              "$value": "{Colors.Danger.500_P}",
+              "$type": "color"
+            }
+          },
+          "Hover": {
+            "Foreground-Cancel": {
+              "$value": "{Colors.Grey.100}",
+              "$type": "color"
+            },
+            "Bg-Hover": {
+              "$value": "{Colors.Danger.600}",
+              "$type": "color"
+            }
+          },
+          "Active": {
+            "Foreground-Active": {
+              "$value": "{Colors.B&W.White}",
+              "$type": "color"
+            },
+            "Bg-Active": {
+              "$value": "{Colors.Danger.700}",
+              "$type": "color"
+            }
+          },
+          "Disabled": {
+            "Foreground-Disabled": {
+              "$value": "{Colors.Grey.900}",
+              "$type": "color"
+            },
+            "Bg-Disabled": {
+              "$value": "{Colors.Grey.300_P}",
+              "$type": "color"
+            }
+          }
+        },
+        "Radius": {
+          "$value": "{Common.Radius.Radius_L}",
+          "$type": "number"
+        },
+        "Gap-8": {
+          "$value": "{Numbers.Spacing.Spacing_ 8}",
+          "$type": "number"
+        },
+        "PaddingV": {
+          "$value": "{Numbers.Spacing.Spacing_ 10}",
+          "$type": "number"
+        },
+        "PaddingH": {
+          "$value": "{Numbers.Spacing.Spacing_ 14}",
+          "$type": "number"
+        }
+      },
+      "Numbers": {
+        "Radius": {
+          "Radius-4": {
+            "$value": "{Numbers.4}",
+            "$type": "number"
+          },
+          "Radius-8": {
+            "$value": "{Numbers.8}",
+            "$type": "number"
+          },
+          "Radius-12": {
+            "$value": "{Numbers.12}",
+            "$type": "number"
+          },
+          "Radius-16": {
+            "$value": "{Numbers.16}",
+            "$type": "number"
+          }
+        },
+        "Spacing": {
+          "Spacing-2": {
+            "$value": "{Numbers.2}",
+            "$type": "number"
+          },
+          "Spacing-4": {
+            "$value": "{Numbers.4}",
+            "$type": "number"
+          },
+          "Spacing-6": {
+            "$value": "{Numbers.6}",
+            "$type": "number"
+          },
+          "Spacing-8": {
+            "$value": "{Numbers.8}",
+            "$type": "number"
+          },
+          "Spacing-10": {
+            "$value": "{Numbers.10}",
+            "$type": "number"
+          },
+          "Spacing-12": {
+            "$value": "{Numbers.12}",
+            "$type": "number"
+          },
+          "Spacing-14": {
+            "$value": "{Numbers.14}",
+            "$type": "number"
+          },
+          "Spacing-16": {
+            "$value": "{Numbers.16}",
+            "$type": "number"
+          },
+          "Spacing-0": {
+            "$value": "{Numbers.0}",
+            "$type": "number"
+          },
+          "Spacing-24": {
+            "$value": "{Numbers.24}",
+            "$type": "number"
+          }
+        }
+      },
+      "Card": {
+        "Basic": {
+          "Bg-Basic": {
+            "$value": "{Common.Colors.Card_Background_Cream}",
+            "$type": "color"
+          },
+          "Padding-16": {
+            "$value": "{Numbers.Spacing.Spacing_ 16}",
+            "$type": "number"
+          },
+          "Spacing-6": {
+            "$value": "{Numbers.Spacing.Spacing_ 6}",
+            "$type": "number"
+          },
+          "Spacing-8": {
+            "$value": "{Numbers.Spacing.Spacing_ 8}",
+            "$type": "number"
+          }
+        },
+        "Border-Card": {
+          "$value": "{Common.Colors.Border_Color}",
+          "$type": "color"
+        }
+      },
+      "Avatar": {
+        "Border-Color-Default": {
+          "$value": "{Colors.Grey.400}",
+          "$type": "color"
+        },
+        "Border-Width-Default": {
+          "$value": "{Numbers.2}",
+          "$type": "number"
+        }
+      },
+      "Text-Fields": {
+        "Text-Fields-Error": {
+          "$value": "{Colors.Danger.600}",
+          "$type": "color"
+        },
+        "Text-Fields-Success": {
+          "$value": "{Colors.Success.600_P}",
+          "$type": "color"
+        },
+        "Text-Fields-Text-Color-Filled": {
+          "$value": "{Common.Colors.Text_Default_Color}",
+          "$type": "color"
+        },
+        "Text-Fields-Text-Color-Empty": {
+          "$value": "{Colors.Grey.700}",
+          "$type": "color"
+        },
+        "Text-Fields-Label-Color": {
+          "$value": "{Common.Colors.Text_Titles_Color}",
+          "$type": "color"
+        },
+        "Text-Fields-Field-Bg-Default": {
+          "$value": "{Colors.B&W.White}",
+          "$type": "color"
+        },
+        "Text-Fields-Icon-Color-Default": {
+          "$value": "{Common.Colors.Icon_Default_Fill}",
+          "$type": "color"
+        },
+        "Text-Fields-Border-Color-Default": {
+          "$value": "{Common.Colors.Border_Color}",
+          "$type": "color"
+        },
+        "Text-Fields-Spacing-V-Default": {
+          "$value": "{Numbers.Spacing.Spacing_ 8}",
+          "$type": "number"
+        },
+        "Text-Fields-Message-Color-Default": {
+          "$value": "{Common.Colors.Text_Default_Color}",
+          "$type": "color"
+        },
+        "Text-Fields-Bg-Default": {
+          "$value": "{Colors.B&W.White}",
+          "$type": "color"
+        }
+      },
+      "Icon": {
+        "Color-Default": {
+          "$value": "{Colors.Grey.900}",
+          "$type": "color"
+        }
+      },
+      "Common": {
+        "Colors": {
+          "Text-Default-Color": {
+            "$value": "{Colors.Grey.900}",
+            "$type": "color"
+          },
+          "Text-Link-Color": {
+            "$value": "{Colors.Primary.500}",
+            "$type": "color"
+          },
+          "Text-Titles-Color": {
+            "$value": "{Colors.Grey.900}",
+            "$type": "color"
+          },
+          "Icon-Default-Fill": {
+            "$value": "{Colors.Grey.900}",
+            "$type": "color"
+          },
+          "Border-Color": {
+            "$value": "{Colors.Grey.500}",
+            "$type": "color"
+          },
+          "Card-Background-Light": {
+            "$value": "{Colors.Grey.100}",
+            "$type": "color"
+          },
+          "Card-Background-Cream": {
+            "$value": "{Colors.Others.Palette_Cream}",
+            "$type": "color"
+          },
+          "Overlay-Color": {
+            "$value": "rgba(0, 0, 0, 0.2)",
+            "$type": "color"
+          }
+        },
+        "Radius": {
+          "Radius-L": {
+            "$value": "{Numbers.Radius.Radius_12}",
+            "$type": "number"
+          },
+          "Radius-M": {
+            "$value": "{Numbers.Radius.Radius_8}",
+            "$type": "number"
+          }
+        },
+        "Spacing": {
+          "Spacing-L": {
+            "$value": "{Numbers.Spacing.Spacing_ 16}",
+            "$type": "number"
+          },
+          "Spacing-M": {
+            "$value": "{Numbers.Spacing.Spacing_ 8}",
+            "$type": "number"
+          },
+          "Spacing-S": {
+            "$value": "{Numbers.Spacing.Spacing_4}",
+            "$type": "number"
+          }
+        }
+      },
+      "Checkbox": {
+        "Label-Text-Default-Color": {
+          "$value": "{Colors.Grey.800}",
+          "$type": "color"
+        },
+        "Spacing-V-Default": {
+          "$value": "{Numbers.Spacing.Spacing_ 8}",
+          "$type": "number"
+        },
+        "Checkbox-Icon-Default-Color-2": {
+          "$value": "{Colors.Grey.800}",
+          "$type": "color"
+        }
+      },
+      "App": {
+        "App-Background-Default": {
+          "$value": "{Colors.Primary.300_P}",
+          "$type": "color"
+        }
+      },
+      "Image": {
+        "Radius-Default": {
+          "$value": "{Numbers.4}",
+          "$type": "number"
+        },
+        "Border-Color-Default": {
+          "$value": "{Colors.Grey.400}",
+          "$type": "color"
+        },
+        "Border-Width-Default": {
+          "$value": "{Numbers.2}",
+          "$type": "number"
+        }
+      },
+      "Rating-Star": {
+        "Fill-Color-Active": {
+          "$value": "{Colors.Secondary.400}",
+          "$type": "color"
+        },
+        "Border-Color-Default": {
+          "$value": "{Colors.Grey.900}",
+          "$type": "color"
+        }
+      },
+      "Bottom-Bar-Button": {
+        "Background-Selected": {
+          "$value": "{Colors.B&W.White}",
+          "$type": "color"
+        },
+        "Icon-Color-Default": {
+          "$value": "{Common.Colors.Icon_Default_Fill}",
+          "$type": "color"
+        }
+      },
+      "TopBar": {
+        "Background-Color": {
+          "$value": "{Colors.Secondary.200_P}",
+          "$type": "color"
+        }
+      },
+      "Alert": {
+        "Background-Color-Information": {
+          "$value": "{Colors.Others.Palette_Cream}",
+          "$type": "color"
+        },
+        "Backgroun-Color-Danger": {
+          "$value": "{Colors.Danger.100}",
+          "$type": "color"
+        },
+        "Backgroun-Color-Positive": {
+          "$value": "{Colors.Secondary.300}",
+          "$type": "color"
+        }
+      },
+      "Radio-Button": {
+        "Checked-Color": {
+          "$value": "{Colors.Grey.800}",
+          "$type": "color"
+        }
+      }
+    },
+    "Translations": {
+      "Card": {
+        "Title": {
+          "$value": "Producto",
+          "$type": "string"
+        },
+        "Subtitle": {
+          "$value": "Dato ppal",
+          "$type": "string"
+        },
+        "Body-Txt": {
+          "$value": "Algo más de información",
+          "$type": "string"
+        },
+        "Button-Primary": {
+          "$value": "Aceptar",
+          "$type": "string"
+        },
+        "Button-Secondary": {
+          "$value": "Cancelar",
+          "$type": "string"
+        }
+      }
+  }
