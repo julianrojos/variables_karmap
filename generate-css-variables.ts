@@ -2,6 +2,18 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
 /**
+ * Tipo para los tokens del JSON
+ */
+interface TokenValue {
+  $value: string;
+  $type?: string;
+}
+
+type TokenData = {
+  [key: string]: TokenData | TokenValue;
+};
+
+/**
  * Convierte un nombre a kebab-case
  */
 function toKebabCase(name: string): string {
@@ -26,38 +38,60 @@ function toKebabCase(name: string): string {
 /**
  * Procesa el valor según su tipo
  */
-function processValue(value: string, varType: string): string {
+function processValue(value: string, varType?: string): string {
+  // Validar que el valor sea string
+  if (typeof value !== 'string') {
+    throw new Error(`El valor debe ser un string, recibido: ${typeof value}`);
+  }
+  
   // Si es una referencia a otro token, la mantenemos como referencia
   if (value.startsWith('{') && value.endsWith('}')) {
     return value;
   }
   
-  // Si es un color rgba, lo mantenemos
-  if (value.startsWith('rgba')) {
+  // Si es un color rgba o rgb, lo mantenemos
+  if (value.startsWith('rgba') || value.startsWith('rgb(')) {
     return value;
   }
   
-  // Si es un string, lo envolvemos en comillas
+  // Si es un color hexadecimal, lo mantenemos
+  if (/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(value)) {
+    return value;
+  }
+  
+  // Si es un string, lo envolvemos en comillas (escapando comillas internas)
   if (varType === 'string') {
-    return `"${value}"`;
+    const escapedValue = value.replace(/"/g, '\\"');
+    return `"${escapedValue}"`;
   }
   
   return value;
 }
 
 /**
+ * Valida que un nombre de variable CSS sea válido
+ */
+function isValidCssVariableName(name: string): boolean {
+  // Los nombres de variables CSS deben empezar con -- y seguir con letras, números, guiones o guiones bajos
+  return /^--[a-zA-Z0-9_-]+$/.test(name);
+}
+
+/**
  * Genera variables CSS recursivamente desde el objeto JSON
  */
 function generateCssVars(
-  obj: any,
+  obj: TokenData,
   prefix: string = '',
   result: string[] = []
 ): string[] {
-  if (typeof obj !== 'object' || obj === null) {
+  if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) {
     return result;
   }
 
-  for (const key in obj) {
+  // Ordenar las claves para garantizar orden consistente
+  const keys = Object.keys(obj).sort();
+
+  for (const key of keys) {
     // Ignorar propiedades que empiezan con $
     if (key.startsWith('$')) {
       continue;
@@ -69,22 +103,49 @@ function generateCssVars(
 
     const value = obj[key];
 
-    if (typeof value === 'object' && value !== null) {
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
       // Si tiene $value, es una variable final
       if ('$value' in value) {
-        const varValue = processValue(
-          value.$value,
-          value.$type || ''
-        );
-        const varName = `--${newPrefix}`;
-        result.push(`  ${varName}: ${varValue};`);
+        const tokenValue = value as TokenValue;
+        
+        // Validar que $value existe y es string
+        if (typeof tokenValue.$value !== 'string') {
+          console.warn(`⚠️  Advertencia: ${newPrefix} tiene un $value que no es string, se omite`);
+          continue;
+        }
+        
+        try {
+          const varValue = processValue(
+            tokenValue.$value,
+            tokenValue.$type
+          );
+          const varName = `--${newPrefix}`;
+          
+          // Validar nombre de variable
+          if (!isValidCssVariableName(varName)) {
+            console.warn(`⚠️  Advertencia: ${varName} no es un nombre de variable CSS válido, se omite`);
+            continue;
+          }
+          
+          result.push(`  ${varName}: ${varValue};`);
+        } catch (error) {
+          console.warn(`⚠️  Advertencia: Error procesando ${newPrefix}: ${error instanceof Error ? error.message : error}`);
+          continue;
+        }
       } else {
         // Es un objeto anidado, continuar recursivamente
-        generateCssVars(value, newPrefix, result);
+        generateCssVars(value as TokenData, newPrefix, result);
       }
-    } else {
+    } else if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
       // Valor primitivo
       const varName = `--${newPrefix}`;
+      
+      // Validar nombre de variable
+      if (!isValidCssVariableName(varName)) {
+        console.warn(`⚠️  Advertencia: ${varName} no es un nombre de variable CSS válido, se omite`);
+        continue;
+      }
+      
       result.push(`  ${varName}: ${value};`);
     }
   }
@@ -94,13 +155,25 @@ function generateCssVars(
 
 /**
  * Extrae los nombres y valores de las variables CSS de un archivo CSS
+ * Mejorado para manejar valores que pueden contener punto y coma
  */
 function extractCssVariables(cssContent: string): Map<string, string> {
   const variables = new Map<string, string>();
-  const regex = /--([a-z0-9-]+):\s*([^;]+);/g;
+  
+  // Buscar el bloque :root { ... }
+  const rootMatch = cssContent.match(/:root\s*\{([^}]+)\}/s);
+  if (!rootMatch) {
+    return variables;
+  }
+  
+  const rootContent = rootMatch[1];
+  
+  // Regex mejorado que maneja valores con punto y coma escapados o en strings
+  // Busca --nombre: valor; donde valor puede contener casi cualquier cosa excepto ; no escapado
+  const regex = /--([a-zA-Z0-9_-]+):\s*([^;]+?);/g;
   let match;
   
-  while ((match = regex.exec(cssContent)) !== null) {
+  while ((match = regex.exec(rootContent)) !== null) {
     const name = match[1];
     const value = match[2].trim();
     variables.set(name, value);
@@ -117,8 +190,23 @@ function main(): void {
     const jsonPath = join(process.cwd(), 'variables.json');
     const cssPath = join(process.cwd(), 'variables.css');
 
+    // Validar que el archivo JSON existe
+    if (!existsSync(jsonPath)) {
+      console.error(`❌ Error: No se encontró el archivo ${jsonPath}`);
+      process.exit(1);
+    }
+
     console.log('📖 Leyendo variables.json...');
-    const fileContent = readFileSync(jsonPath, 'utf-8');
+    let fileContent: string;
+    try {
+      fileContent = readFileSync(jsonPath, 'utf-8');
+    } catch (error) {
+      console.error(`❌ Error al leer el archivo ${jsonPath}:`);
+      if (error instanceof Error) {
+        console.error(`   ${error.message}`);
+      }
+      process.exit(1);
+    }
 
     // Leer el archivo CSS anterior si existe para comparar
     let previousVariables: Map<string, string> = new Map();
@@ -133,7 +221,7 @@ function main(): void {
     }
 
     // Parsear JSON
-    let data: any;
+    let data: { Tokens?: TokenData; [key: string]: unknown };
     try {
       data = JSON.parse(fileContent);
     } catch (error) {
@@ -177,10 +265,17 @@ function main(): void {
     }
 
     // Extraer solo Tokens (excluir Translations si existe)
-    let tokensData = data;
-    if ('Tokens' in data && typeof data.Tokens === 'object') {
-      tokensData = data.Tokens;
+    let tokensData: TokenData;
+    if ('Tokens' in data && typeof data.Tokens === 'object' && data.Tokens !== null && !Array.isArray(data.Tokens)) {
+      tokensData = data.Tokens as TokenData;
+    } else if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
+      tokensData = data as TokenData;
+    } else {
+      console.error('❌ Error: El JSON no contiene una estructura de tokens válida');
+      process.exit(1);
     }
+    
+    // Eliminar Translations si existe
     if ('Translations' in tokensData) {
       delete tokensData.Translations;
     }
@@ -191,8 +286,9 @@ function main(): void {
     // Extraer nombres y valores de variables nuevas
     const newVariables = new Map<string, string>();
     cssVars.forEach(line => {
-      const match = line.match(/--([a-z0-9-]+):\s*([^;]+);/);
-      if (match) {
+      // Regex mejorado para extraer nombre y valor
+      const match = line.match(/--([a-zA-Z0-9_-]+):\s*([^;]+?);/);
+      if (match && match[1] && match[2]) {
         const name = match[1];
         const value = match[2].trim();
         newVariables.set(name, value);
