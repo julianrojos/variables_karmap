@@ -597,7 +597,7 @@
       "Bold": {
         "$value": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:46:319"
+          "id": "VariableID:2008:865"
         },
         "$type": "string"
       }
@@ -1478,7 +1478,7 @@
     "Bold-H1 40": {
       "$value": {
         "fontFamily": "Lora",
-        "fontWeight": "Bold",
+        "fontWeight": "SemiBold",
         "fontSize": 36,
         "lineHeight": {
           "unit": "AUTO"
@@ -1495,7 +1495,7 @@
     "Bold-H2 32": {
       "$value": {
         "fontFamily": "Lora",
-        "fontWeight": "Bold",
+        "fontWeight": "SemiBold",
         "fontSize": 32,
         "lineHeight": {
           "unit": "AUTO"
@@ -1529,7 +1529,7 @@
     "Bold-Title 24": {
       "$value": {
         "fontFamily": "Lora",
-        "fontWeight": "Bold",
+        "fontWeight": "SemiBold",
         "fontSize": 24,
         "lineHeight": {
           "unit": "AUTO"
@@ -1546,7 +1546,7 @@
     "Bold-Title 20": {
       "$value": {
         "fontFamily": "Lora",
-        "fontWeight": "Bold",
+        "fontWeight": "SemiBold",
         "fontSize": 20,
         "lineHeight": {
           "unit": "AUTO"
@@ -1563,7 +1563,7 @@
     "Bold-Subtitle 18": {
       "$value": {
         "fontFamily": "Nunito Sans",
-        "fontWeight": "Bold",
+        "fontWeight": "SemiBold",
         "fontSize": 18,
         "lineHeight": {
           "unit": "AUTO"
@@ -1580,7 +1580,7 @@
     "Bold-Body 16": {
       "$value": {
         "fontFamily": "Nunito Sans",
-        "fontWeight": "Bold",
+        "fontWeight": "SemiBold",
         "fontSize": 16,
         "lineHeight": {
           "unit": "AUTO"
@@ -1597,7 +1597,7 @@
     "Bold-Body 16 underlined": {
       "$value": {
         "fontFamily": "Nunito Sans",
-        "fontWeight": "Bold",
+        "fontWeight": "SemiBold",
         "fontSize": 16,
         "lineHeight": {
           "unit": "AUTO"
@@ -1614,7 +1614,7 @@
     "Bold-Body 14": {
       "$value": {
         "fontFamily": "Nunito Sans",
-        "fontWeight": "Bold",
+        "fontWeight": "SemiBold",
         "fontSize": 14,
         "lineHeight": {
           "unit": "AUTO"
@@ -1631,7 +1631,7 @@
     "Bold-Body 14 Uppercase": {
       "$value": {
         "fontFamily": "Nunito Sans",
-        "fontWeight": "Bold",
+        "fontWeight": "SemiBold",
         "fontSize": 14,
         "lineHeight": {
           "unit": "AUTO"
@@ -1648,7 +1648,7 @@
     "Bold-Small 12": {
       "$value": {
         "fontFamily": "Nunito Sans",
-        "fontWeight": "Bold",
+        "fontWeight": "SemiBold",
         "fontSize": 12,
         "lineHeight": {
           "unit": "AUTO"
@@ -1665,7 +1665,7 @@
     "Bold-Tiny 10": {
       "$value": {
         "fontFamily": "Nunito Sans",
-        "fontWeight": "Bold",
+        "fontWeight": "SemiBold",
         "fontSize": 10,
         "lineHeight": {
           "unit": "AUTO"
