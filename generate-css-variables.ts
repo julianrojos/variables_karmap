@@ -2,11 +2,14 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
 /**
- * Tipo para los tokens del JSON
+ * Tipo para los tokens del JSON según formato W3C Design Tokens
  */
+type TokenValueType = string | number | boolean | object | null;
+
 interface TokenValue {
-  $value: string;
+  $value: TokenValueType | TokenValueType[];
   $type?: string;
+  $description?: string;
 }
 
 type TokenData = {
@@ -36,36 +39,128 @@ function toKebabCase(name: string): string {
 }
 
 /**
- * Procesa el valor según su tipo
+ * Convierte un objeto de referencia VARIABLE_ALIAS a formato W3C Design Tokens
+ * Nota: Las referencias VARIABLE_ALIAS con ID necesitan resolverse a rutas de tokens.
+ * En el formato W3C Design Tokens estándar, las referencias se hacen con {token.path}
  */
-function processValue(value: string, varType?: string): string {
-  // Validar que el valor sea string
-  if (typeof value !== 'string') {
-    throw new Error(`El valor debe ser un string, recibido: ${typeof value}`);
+function processVariableAlias(aliasObj: any, currentPath: string[]): string {
+  // Si es un objeto con type: "VARIABLE_ALIAS", intentamos manejarlo
+  if (aliasObj && typeof aliasObj === 'object' && aliasObj.type === 'VARIABLE_ALIAS') {
+    // Si tiene un id, intentamos generar una referencia
+    // Nota: Idealmente esto debería resolverse al path completo del token referenciado
+    // Por ahora, generamos una referencia genérica que el usuario puede ajustar
+    if (aliasObj.id) {
+      console.warn(`⚠️  Referencia VARIABLE_ALIAS encontrada en ${currentPath.join('.')} con ID: ${aliasObj.id}`);
+      console.warn(`   Considera convertir esto a formato W3C: {token.path}`);
+    }
+    // Generamos una referencia CSS válida (aunque no sea la referencia correcta)
+    // El usuario deberá actualizar estas referencias manualmente o con un mapeo de IDs
+    return `var(--${currentPath.join('-')})`;
   }
-  
-  // Si es una referencia a otro token, la mantenemos como referencia
-  if (value.startsWith('{') && value.endsWith('}')) {
+  return JSON.stringify(aliasObj);
+}
+
+/**
+ * Convierte un shadow object a formato CSS
+ */
+function processShadow(shadowObj: any): string {
+  if (!shadowObj || typeof shadowObj !== 'object') {
+    return JSON.stringify(shadowObj);
+  }
+
+  const type = shadowObj.type || 'DROP_SHADOW';
+  const color = shadowObj.color || { r: 0, g: 0, b: 0, a: 1 };
+  const offset = shadowObj.offset || { x: 0, y: 0 };
+  const radius = shadowObj.radius || 0;
+  const spread = shadowObj.spread || 0;
+
+  // Convertir color RGBA
+  const r = Math.round((color.r || 0) * 255);
+  const g = Math.round((color.g || 0) * 255);
+  const b = Math.round((color.b || 0) * 255);
+  const a = color.a !== undefined ? color.a : 1;
+
+  const rgba = `rgba(${r}, ${g}, ${b}, ${a})`;
+  const offsetX = offset.x || 0;
+  const offsetY = offset.y || 0;
+
+  if (type === 'INNER_SHADOW') {
+    return `inset ${offsetX}px ${offsetY}px ${radius}px ${spread}px ${rgba}`;
+  } else {
+    return `${offsetX}px ${offsetY}px ${radius}px ${spread}px ${rgba}`;
+  }
+}
+
+/**
+ * Procesa el valor según su tipo según formato W3C Design Tokens
+ */
+function processValue(
+  value: TokenValueType | TokenValueType[],
+  varType?: string,
+  currentPath: string[] = []
+): string {
+  // Si es null o undefined
+  if (value === null || value === undefined) {
+    return 'null';
+  }
+
+  // Si es un array (para shadows, gradients, etc.)
+  if (Array.isArray(value)) {
+    if (varType === 'shadow') {
+      // Procesar cada shadow y unirlos con comas
+      const shadows = value.map(processShadow);
+      return shadows.join(', ');
+    }
+    // Para otros tipos de arrays, convertirlos a JSON
+    return JSON.stringify(value);
+  }
+
+  // Si es un objeto
+  if (typeof value === 'object') {
+    // Verificar si es una referencia VARIABLE_ALIAS
+    if (value && typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
+      return processVariableAlias(value, currentPath);
+    }
+    
+    // Si es un objeto de referencia W3C (formato {token.path})
+    // Esto se maneja como string en el JSON
+    return JSON.stringify(value);
+  }
+
+  // Si es un string
+  if (typeof value === 'string') {
+    // Si es una referencia a otro token (formato W3C: {token.path})
+    if (value.startsWith('{') && value.endsWith('}')) {
+      // Convertir {token.path} a var(--token-path)
+      const tokenPath = value.slice(1, -1).replace(/\./g, '-');
+      return `var(--${tokenPath})`;
+    }
+    
+    // Si es un color rgba o rgb, lo mantenemos
+    if (value.startsWith('rgba') || value.startsWith('rgb(')) {
+      return value;
+    }
+    
+    // Si es un color hexadecimal, lo mantenemos
+    if (/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(value)) {
+      return value;
+    }
+    
+    // Si el tipo es string, lo envolvemos en comillas (escapando comillas internas)
+    if (varType === 'string') {
+      const escapedValue = value.replace(/"/g, '\\"');
+      return `"${escapedValue}"`;
+    }
+    
     return value;
   }
-  
-  // Si es un color rgba o rgb, lo mantenemos
-  if (value.startsWith('rgba') || value.startsWith('rgb(')) {
-    return value;
+
+  // Si es un número o booleano, lo convertimos a string
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
   }
-  
-  // Si es un color hexadecimal, lo mantenemos
-  if (/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(value)) {
-    return value;
-  }
-  
-  // Si es un string, lo envolvemos en comillas (escapando comillas internas)
-  if (varType === 'string') {
-    const escapedValue = value.replace(/"/g, '\\"');
-    return `"${escapedValue}"`;
-  }
-  
-  return value;
+
+  return String(value);
 }
 
 /**
@@ -77,12 +172,13 @@ function isValidCssVariableName(name: string): boolean {
 }
 
 /**
- * Genera variables CSS recursivamente desde el objeto JSON
+ * Genera variables CSS recursivamente desde el objeto JSON en formato W3C Design Tokens
  */
 function generateCssVars(
   obj: TokenData,
   prefix: string = '',
-  result: string[] = []
+  result: string[] = [],
+  currentPath: string[] = []
 ): string[] {
   if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) {
     return result;
@@ -92,7 +188,7 @@ function generateCssVars(
   const keys = Object.keys(obj).sort();
 
   for (const key of keys) {
-    // Ignorar propiedades que empiezan con $
+    // Ignorar propiedades que empiezan con $ (metadatos del formato W3C)
     if (key.startsWith('$')) {
       continue;
     }
@@ -100,24 +196,22 @@ function generateCssVars(
     const newPrefix = prefix
       ? `${prefix}-${toKebabCase(key)}`
       : toKebabCase(key);
+    
+    const newPath = [...currentPath, key];
 
     const value = obj[key];
 
     if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-      // Si tiene $value, es una variable final
+      // Si tiene $value, es un token final según formato W3C Design Tokens
       if ('$value' in value) {
         const tokenValue = value as TokenValue;
         
-        // Validar que $value existe y es string
-        if (typeof tokenValue.$value !== 'string') {
-          console.warn(`⚠️  Advertencia: ${newPrefix} tiene un $value que no es string, se omite`);
-          continue;
-        }
-        
         try {
+          // Procesar el valor según su tipo (puede ser string, number, boolean, object, array)
           const varValue = processValue(
             tokenValue.$value,
-            tokenValue.$type
+            tokenValue.$type,
+            newPath
           );
           const varName = `--${newPrefix}`;
           
@@ -133,11 +227,11 @@ function generateCssVars(
           continue;
         }
       } else {
-        // Es un objeto anidado, continuar recursivamente
-        generateCssVars(value as TokenData, newPrefix, result);
+        // Es un objeto anidado (grupo de tokens), continuar recursivamente
+        generateCssVars(value as TokenData, newPrefix, result, newPath);
       }
     } else if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-      // Valor primitivo
+      // Valor primitivo directo (no es formato W3C estándar, pero lo soportamos)
       const varName = `--${newPrefix}`;
       
       // Validar nombre de variable
@@ -220,8 +314,8 @@ function main(): void {
       }
     }
 
-    // Parsear JSON
-    let data: { Tokens?: TokenData; [key: string]: unknown };
+    // Parsear JSON en formato W3C Design Tokens
+    let data: { $schema?: string; Tokens?: TokenData; [key: string]: unknown };
     try {
       data = JSON.parse(fileContent);
     } catch (error) {
@@ -264,23 +358,29 @@ function main(): void {
       }
     }
 
-    // Extraer solo Tokens (excluir Translations si existe)
+    // Extraer tokens según formato W3C Design Tokens
+    // El formato W3C puede tener $schema y los tokens pueden estar en una propiedad específica
+    // o directamente en el objeto raíz
     let tokensData: TokenData;
     if ('Tokens' in data && typeof data.Tokens === 'object' && data.Tokens !== null && !Array.isArray(data.Tokens)) {
       tokensData = data.Tokens as TokenData;
     } else if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
+      // Los tokens están directamente en el objeto raíz
       tokensData = data as TokenData;
     } else {
-      console.error('❌ Error: El JSON no contiene una estructura de tokens válida');
+      console.error('❌ Error: El JSON no contiene una estructura de tokens válida en formato W3C Design Tokens');
       process.exit(1);
     }
     
-    // Eliminar Translations si existe
+    // Eliminar propiedades de metadatos del formato W3C ($schema, Translations, etc.)
+    if ('$schema' in tokensData) {
+      delete tokensData.$schema;
+    }
     if ('Translations' in tokensData) {
       delete tokensData.Translations;
     }
 
-    console.log('🔄 Generando variables CSS desde variables.json...');
+    console.log('🔄 Generando variables CSS desde variables.json (formato W3C Design Tokens)...');
     const cssVars = generateCssVars(tokensData);
 
     // Extraer nombres y valores de variables nuevas
